@@ -1,7 +1,10 @@
 # Graph‑RAG Biomedical Fact‑Checking Framework
 
 A full biomedical fact‑checking pipeline designed to **validate extracted SPO claims** from biomedical text.  
-The system integrates **UMLS normalization**, **Graph‑RAG evidence retrieval**, **decision models**, and **vlaim and ocument‑level trust scoring**.
+The system integrates **UMLS normalization**, **Graph‑RAG evidence retrieval**, **decision models**, and **claim‑ and document‑level trust scoring**.
+
+> 📦 **Preprocessed data available.** All datasets used in our experiments are released already preprocessed, with their extracted SPO claims, UMLS‑normalized entities, and retrieved evidence, so results can be reproduced without rerunning the LLM extraction and retrieval steps.  
+> ➡️ Download **`data.zip`** from the [**v1 release**](https://github.com/phdResearcherDz/Biomedical-Fact-Checking-framework/releases/tag/v1). See [Preprocessed Data (Release v1)](#-preprocessed-data-release-v1).
 
 ---
 
@@ -35,7 +38,7 @@ Weighted fusion based on claim predictions → Global trust score τₓ.
 
 ### ✔ Dataset Formatters Included
 
-We build formaters for each of these datasets:
+We built formatters for each of these datasets:
 
 - **SciFact**
 - **BioASQ**
@@ -109,6 +112,35 @@ We build formaters for each of these datasets:
 
 ---
 
+## 📦 Preprocessed Data (Release v1)
+
+To make reproduction easy, we share the outputs of the expensive preprocessing stages as a release asset, so you do not need to rerun claim extraction with the LLM agent, UMLS normalization, or evidence retrieval.
+
+**Download:** [`data.zip`](https://github.com/phdResearcherDz/Biomedical-Fact-Checking-framework/releases/download/v1/data.zip) (83 MB) from the [v1 release](https://github.com/phdResearcherDz/Biomedical-Fact-Checking-framework/releases/tag/v1).
+
+The archive contains, for each dataset (train/dev/test):
+
+- **Unified fact‑checking format**: the datasets converted by the scripts in `data_preprocessing/`, including the poisoned BioASQ and PubMedQA splits.
+- **Extracted SPO claims**: triplets produced by the LLM agent (Gemma‑3‑12B‑IT).
+- **UMLS‑normalized claims**: subjects and objects augmented with their canonical name and CUI.
+- **Retrieved evidence**: the top‑ranked evidence triplets from the reference knowledge graph for each claim.
+- **Decision‑model training data**: claim–evidence pairs with gold labels used to fine‑tune the PubMedBERT classifier.
+
+### Usage
+
+Unzip the archive at the repository root so that its contents populate the `data/` folder:
+
+```bash
+wget https://github.com/phdResearcherDz/Biomedical-Fact-Checking-framework/releases/download/v1/data.zip
+unzip data.zip -d .
+```
+
+You can then skip steps 0–2 of the pipeline and start directly from **Step 3 (Train Claim‑Level Classifier)** or **Step 4 (Document‑Level Aggregation)**.
+
+> ⚠️ The source datasets keep their original licenses. Please cite the original dataset papers when using these processed versions.
+
+---
+
 ## 🛠 Requirements
 
 ### 🧬 Python
@@ -158,7 +190,9 @@ Training and evaluation were performed on:
 
 ## ⚙️ Pipeline Usage
 
-### ### 1️⃣ Extract & Normalize Claims
+> 💡 If you downloaded the [preprocessed data](#-preprocessed-data-release-v1), you can skip steps 1–2.
+
+### 1️⃣ Extract & Normalize Claims
 
 ```bash
 python _0_building_ref_docs_graph/2_normalize_medical_concepts.py
@@ -215,7 +249,7 @@ Example output:
 
 ## 📘 Dataset Conversion Tools
 
-Scripts included to convert raw datasets that is available [here](https://mega.nz/file/ShwUXRaA#bu-e1IlR8dzk36rqb3KVx-_KYvVz2c_ZLQppbiIqaHQ) into the Fact-Checking Framework format:
+Scripts included to convert raw datasets, which are available [here](https://mega.nz/file/ShwUXRaA#bu-e1IlR8dzk36rqb3KVx-_KYvVz2c_ZLQppbiIqaHQ) into the Fact-Checking Framework format:
 
 - **SciFact converter**
 - **BioASQ Yes/No converter + poisoned splits**
